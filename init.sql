@@ -2,8 +2,8 @@
 CREATE TYPE state_enum AS ENUM ('new', 'used');
 CREATE TYPE availability_enum AS ENUM ('available', 'not available');
 
--- Create the inventory table if it doesn't exist
-CREATE TABLE IF NOT EXISTS inventory (
+-- Create the vehicles table if it doesn't exist
+CREATE TABLE IF NOT EXISTS vehicles (
     id SERIAL PRIMARY KEY,
     make VARCHAR(50) NOT NULL,
     model VARCHAR(50) NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS inventory (
 );
 
 -- Insert sample data
-INSERT INTO inventory (make, model, year, price, state, availability)
+INSERT INTO vehicles (make, model, year, price, state, availability)
 VALUES 
     ('Toyota', 'Corolla', 2021, 20000, 'new', 'available'),
     ('Ford', 'Focus', 2019, 15000, 'used', 'available'),

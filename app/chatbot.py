@@ -1,116 +1,177 @@
 from groq import Groq
 import os
-from typing import Dict
+from typing import Dict, List, Optional
+from datetime import datetime
 import logging
+import json
+from pydantic import BaseModel, Field
 from app.database import SessionLocal
 from app.models import Vehicle
 
-# Configure logging
-logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
+# Configure logging only for our chatbot
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)  # Changed from DEBUG to INFO
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 
-# Store session-level memory
-conversation_memory = {}
+# Add handlers with our specific formatting
+file_handler = logging.FileHandler('chatbot.log')
+file_handler.setFormatter(formatter)
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(formatter)
 
-def get_api_key():
-    logging.debug("Fetching API key...")
-    api_key = os.getenv('GROQ_API_KEY')
-    if api_key:
-        logging.debug("API key fetched from environment variables.")
-    else:
-        logging.warning("API key not found.")
-    return api_key
+logger.addHandler(file_handler)
+logger.addHandler(stream_handler)
 
-def get_vehicles() -> str:
-    """Fetch vehicles directly from the database."""
-    try:
+# Prevent logs from propagating to the root logger
+logger.propagate = False
+
+class Conversation(BaseModel):
+    """Model to track conversation history and context"""
+    messages: List[Dict[str, str]] = Field(default_factory=list)
+    last_interaction: datetime = Field(default_factory=datetime.now)
+    context: Dict = Field(default_factory=dict)
+
+class VehicleQuery(BaseModel):
+    """Model to structure vehicle search parameters"""
+    make: Optional[str] = None
+    model: Optional[str] = None
+    year: Optional[int] = None
+    max_price: Optional[float] = None
+    state: Optional[str] = None
+
+class Chatbot:
+    def __init__(self):
+        logger.info("Initializing chatbot...")
+        self.client = self._initialize_groq_client()
+        self.conversations: Dict[str, Conversation] = {}
+        self.model = "mixtral-8x7b-32768"
+        
+    @staticmethod
+    def _get_api_key() -> str:
+        """Get API key from environment variables"""
+        api_key = os.getenv('GROQ_API_KEY')
+        if not api_key:
+            logger.error("GROQ_API_KEY not found in environment variables")
+            raise ValueError("GROQ_API_KEY not found")
+        return api_key
+
+    def _initialize_groq_client(self) -> Groq:
+        """Initialize Groq client with error handling"""
+        try:
+            client = Groq(api_key=self._get_api_key())
+            logger.info("Groq client initialized successfully")
+            return client
+        except Exception as e:
+            logger.error(f"Failed to initialize Groq client: {e}")
+            raise
+
+    def _get_vehicles(self) -> str:
+        """
+        Fetch all available vehicles and format them as JSON for AI consumption.
+        """
         db = SessionLocal()
-        vehicles = db.query(Vehicle).all()  # Query the Vehicle model
-        db.close()
+        try:
+            vehicles = db.query(Vehicle).all()  # Fetch all vehicles from the database
+            logger.info(f"Retrieved {len(vehicles)} vehicles from database")
+            
+            # Create a list of dictionaries for each vehicle
+            vehicle_details = [
+                {
+                    "make": v.make,
+                    "model": v.model,
+                    "year": v.year,
+                    "price": float(v.price),
+                    "state": v.state.name,
+                    "availability": v.availability.name
+                }
+                for v in vehicles
+            ]
+            
+            # Convert to JSON string
+            inventory_json = json.dumps({
+                "vehicles": vehicle_details,
+                "total_vehicles": len(vehicle_details)
+            }, indent=2)  # Pretty-print JSON for readability
+            
+            logger.debug(f"Vehicle inventory in JSON format: {inventory_json}")
+            return inventory_json
+        except Exception as e:
+            logger.error(f"Database error: {e}")
+            raise
+        finally:
+            db.close()
 
-        inventory = []
-        for vehicle in vehicles:
-            inventory.append({
-                "year": vehicle.year,  # Updated field names
-                "make": vehicle.make,  # Updated field names
-                "model": vehicle.model,  # Updated field names
-                "price": float(vehicle.price),  # Convert Decimal to float
-                "state": vehicle.state.name,  # Convert Enum to string (name)
-                "availability": vehicle.availability.name  # Convert Enum to string (name)
-            })
-        
-        inventory_text = "Current available vehicles:\n"
-        for vehicle in inventory:
-            inventory_text += f"- {vehicle['year']} {vehicle['make']} {vehicle['model']}: "
-            inventory_text += f"${vehicle['price']:,.2f}, {vehicle['state']}, {vehicle['availability']}\n"
-        
-        return inventory_text
-    except Exception as e:
-        logging.error(f"Error fetching vehicles from database: {str(e)}")
-        return "Unable to fetch vehicles."
 
 
-# Initialize the Groq client
-logging.debug("Initializing Groq client...")
-client = Groq(api_key=get_api_key())
-if client:
-    logging.debug("Groq client initialized successfully.")
+
+    def _build_system_prompt(self, conversation: Conversation, inventory_json: str) -> str:
+        """
+        Build a dynamic system prompt with JSON-formatted inventory data.
+        """
+        return f"""
+    You are a knowledgeable and friendly car sales assistant. 
+
+    Guidelines:
+    - You are provided with the dealership's inventory in JSON format.
+    - If no matching vehicles are found, suggest reasonable alternatives from the available options.
+    - Avoid speculating about vehicles not in the inventory.
+    - Avoid using newline characters ('\\n') in your response.
+
+    Here is the dealership's inventory:
+    {inventory_json}
+
+    Conversation context: {conversation.context}
+    """
+
+    def get_response(self, user_input: str, session_id: str = "default") -> Dict:
+        """
+        Generate chatbot response with conversation management
+        """
+        try:
+            # Initialize or get existing conversation
+            if session_id not in self.conversations:
+                logger.info(f"Creating new conversation session: {session_id}")
+                self.conversations[session_id] = Conversation()
+            
+            conversation = self.conversations[session_id]
+            conversation.last_interaction = datetime.now()
+            
+            # Get filtered inventory (now we don't parse the user input)
+            inventory = self._get_vehicles()
+
+            # Build prompt and get response
+            system_prompt = self._build_system_prompt(conversation, inventory)
+            logger.info(f"System prompt: {system_prompt}")
+            conversation.messages.append({"role": "user", "content": user_input})
+            
+            logger.info("Sending request to Groq API")
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    *conversation.messages[-5:]
+                ],
+                temperature=0.7,
+                max_tokens=450,
+                top_p=1,
+                stream=False
+            )
+            
+            response_content = response.choices[0].message.content
+            conversation.messages.append({"role": "assistant", "content": response_content})
+            logger.info("Successfully generated response from Groq API")
+            
+            return {"status": "success", "response": response_content}
+            
+        except Exception as e:
+            logger.error(f"Error generating response: {e}")
+            return {"status": "error", "response": str(e)}
+
+# Initialize singleton instance
+chatbot = Chatbot()
 
 def get_chatbot_response(user_input: str) -> Dict:
-    try:
-        # Add user input to memory
-        conversation_memory['last_input'] = user_input
-        logging.debug(f"Storing user input in memory: {user_input}")
-
-        # Get current inventory
-        inventory = get_vehicles()
-        
-        # Build dynamic system prompt, including user input and memory
-        system_prompt = f"""You are a helpful car sales assistant. You have access to our current inventory:
-
-{inventory}
-
-Please provide concise, relevant information about vehicles based on our actual inventory. 
-When discussing prices or availability, only reference the vehicles we actually have.
-If a customer asks about a vehicle we don't have, politely let them know and suggest similar available alternatives from our inventory.
-
-Previous user query: {conversation_memory.get('last_input', 'No previous query')}
-
-Important: Please avoid using newline characters ('\\n') in your response. Format your response in a single line, with information separated by commas or other appropriate delimiters.
-"""
-        logging.debug(f"Generated system prompt: {system_prompt}")
-
-        # Sending request to Groq API with system prompt
-        logging.debug("Sending request to Groq API...")
-        response = client.chat.completions.create(
-            model="mixtral-8x7b-32768",
-            messages=[
-                {
-                    "role": "system", 
-                    "content": system_prompt
-                },
-                {
-                    "role": "user", 
-                    "content": user_input
-                }
-            ],
-            temperature=0.7,
-            max_tokens=450,  # To allow for longer responses
-            top_p=1,
-            stream=False
-        )
-        logging.debug("Response received from Groq API.")
-
-        # Store response in memory for later use (e.g., referring back to the last response)
-        conversation_memory['last_response'] = response.choices[0].message.content
-
-        return {
-            "response": response.choices[0].message.content,
-            "status": "success"
-        }
-    except Exception as e:
-        logging.error(f"Error in get_chatbot_response(): {e}")
-        return {
-            "response": str(e),
-            "status": "error"
-        }
-
+    """
+    Public interface for chatbot functionality
+    """
+    return chatbot.get_response(user_input)

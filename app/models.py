@@ -14,7 +14,7 @@ class AvailabilityEnum(enum.Enum):
 
 # SQLAlchemy Model
 class Vehicle(Base):
-    __tablename__ = 'inventory'
+    __tablename__ = 'vehicles'
 
     id = Column(Integer, primary_key=True, index=True)
     make = Column(String(50), index=True)

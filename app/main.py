@@ -17,7 +17,7 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Vehicle Dealership API",
-    description="API for managing vehicle inventory and sales",
+    description="API for managing vehicle inventory and an AI salesman",
     version="1.0.0"
 )
 
@@ -60,7 +60,7 @@ async def root():
     response_model=List[VehicleResponse],
     status_code=status.HTTP_200_OK
 )
-async def get_inventory(
+async def get_vehicles(
     skip: int = 0, 
     limit: int = 100,
     db: Session = Depends(get_db)
