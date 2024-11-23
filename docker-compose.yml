@@ -9,9 +9,11 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: autobahn
     volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # Mount the init.sql script
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - "5432:5432"  # Expose the PostgreSQL port
+      - "5432:5432"
+    networks:
+      - backend_network
 
   backend:
     build: .
@@ -26,7 +28,7 @@ services:
     networks:
       - backend_network
 
-
 networks:
   backend_network:
+    name: backend_network
     driver: bridge
