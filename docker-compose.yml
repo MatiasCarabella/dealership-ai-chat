@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: sales-ai_db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: autobahn
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # Mount the init.sql script
+    ports:
+      - "5432:5432"  # Expose the PostgreSQL port
+
+  backend:
+    build: .
+    container_name: sales-ai_backend
+    environment:
+      DATABASE_URL: postgresql+psycopg2://user:password@db:5432/autobahn
+      PYTHONPATH: /app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    networks:
+      - backend_network
+
+
+networks:
+  backend_network:
+    driver: bridge
