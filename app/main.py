@@ -50,7 +50,7 @@ def get_vehicle(vehicle_id: int, db: Session = Depends(get_db)):
 
 @app.post("/api/vehicles", response_model=VehicleResponse)
 def create_vehicle(vehicle: VehicleCreate, db: Session = Depends(get_db)):
-    db_vehicle = Vehicle(**vehicle.model_dump())
+    db_vehicle = Vehicle(**vehicle.dict())
     db.add(db_vehicle)
     db.commit()
     db.refresh(db_vehicle)
@@ -62,7 +62,3 @@ async def chat_endpoint(chat_input: ChatInput):
     if response["status"] == "error":
         raise HTTPException(status_code=500, detail=response["response"])
     return response
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
