@@ -45,7 +45,7 @@ def get_inventory(db: Session = Depends(get_db)):
 def get_vehicle(vehicle_id: int, db: Session = Depends(get_db)):
     vehicle = db.query(Vehicle).filter(Vehicle.id == vehicle_id).first()
     if vehicle is None:
-        raise HTTPException(status_code=204, detail="Vehicle not found")
+        raise HTTPException(status_code=404, detail="Vehicle not found")
     return vehicle
 
 @app.post("/api/vehicles", response_model=VehicleResponse)
@@ -55,6 +55,34 @@ def create_vehicle(vehicle: VehicleCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_vehicle)
     return db_vehicle
+
+@app.delete("/api/vehicles/{vehicle_id}", response_model=Dict)
+def delete_vehicle(vehicle_id: int, db: Session = Depends(get_db)):
+    vehicle = db.query(Vehicle).filter(Vehicle.id == vehicle_id).first()
+    
+    if vehicle is None:
+        raise HTTPException(status_code=404, detail="Vehicle not found")
+    
+    # Store vehicle details before deletion
+    vehicle_details = {
+        "id": vehicle.id,
+        "make": vehicle.make,
+        "model": vehicle.model,
+        "year": vehicle.year,
+        "price": float(vehicle.price),  # Convert Decimal to float
+        "state": vehicle.state.name,  # Convert Enum to string
+        "availability": vehicle.availability.name  # Convert Enum to string
+    }
+
+    db.delete(vehicle)
+    db.commit()
+    
+    # Include the deleted vehicle's details in the response
+    return {
+        "message": f"Vehicle with id {vehicle_id} deleted successfully.",
+        "vehicle_details": vehicle_details
+    }
+
 
 @app.post("/api/chat", response_model=Dict)
 async def chat_endpoint(chat_input: ChatInput):

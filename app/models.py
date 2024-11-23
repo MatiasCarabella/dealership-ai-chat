@@ -4,34 +4,34 @@ from pydantic import BaseModel
 import enum
 
 # SQLAlchemy Enums
-class EstadoEnum(enum.Enum):
-    nuevo = 'nuevo'
-    usado = 'usado'
+class StateEnum(enum.Enum):
+    new = 'new'
+    used = 'used'
 
-class DisponibilidadEnum(enum.Enum):
-    disponible = 'disponible'
-    no_disponible = 'no disponible'
+class AvailabilityEnum(enum.Enum):
+    available = 'available'
+    not_available = 'not available'
 
 # SQLAlchemy Model
 class Vehicle(Base):
     __tablename__ = 'inventory'
 
     id = Column(Integer, primary_key=True, index=True)
-    marca = Column(String(50), index=True)
-    modelo = Column(String(50), index=True)
-    año = Column(Integer)
-    precio = Column(Numeric(10, 2))
-    estado = Column(Enum(EstadoEnum, name='estado_enum'))
-    disponibilidad = Column(Enum(DisponibilidadEnum, name='disponibilidad_enum'))
+    make = Column(String(50), index=True)
+    model = Column(String(50), index=True)
+    year = Column(Integer)
+    price = Column(Numeric(10, 2))
+    state = Column(Enum(StateEnum, name='state_enum'))
+    availability = Column(Enum(AvailabilityEnum, name='availability_enum'))
 
 # Pydantic Models
 class VehicleBase(BaseModel):
-    marca: str
-    modelo: str
-    año: int
-    precio: float
-    estado: str  # Will validate against EstadoEnum values
-    disponibilidad: str  # Will validate against DisponibilidadEnum values
+    make: str
+    model: str
+    year: int
+    price: float
+    state: str  # Will validate against StateEnum values
+    availability: str  # Will validate against AvailabilityEnum values
 
 class VehicleCreate(VehicleBase):
     pass
