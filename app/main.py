@@ -16,8 +16,8 @@ from app.chatbot import get_chatbot_response
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="Vehicle Dealership API",
-    description="API for managing vehicle inventory and an AI salesman",
+    title="Dealership AI Chat",
+    description="APIs for managing vehicle inventory plus an AI salesman chatbot",
     version="1.0.0"
 )
 
@@ -49,7 +49,7 @@ async def validation_exception_handler(request, exc):
 @app.get("/api", status_code=status.HTTP_200_OK)
 async def root():
     """
-    Root endpoint returning API welcome message and version
+    Root endpoint returning API welcome message
     """
     return {
         "message": "Welcome to the Vehicle Dealership API"
@@ -61,14 +61,12 @@ async def root():
     status_code=status.HTTP_200_OK
 )
 async def get_vehicles(
-    skip: int = 0, 
-    limit: int = 100,
     db: Session = Depends(get_db)
 ):
     """
-    Get all vehicles with pagination support
+    Get all vehicles
     """
-    vehicles = db.query(Vehicle).offset(skip).limit(limit).all()
+    vehicles = db.query(Vehicle).all()
     return vehicles
 
 @app.get(
@@ -110,6 +108,74 @@ async def create_vehicle(vehicle: VehicleCreate, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to create vehicle: {str(e)}"
+        )
+    
+@app.patch(
+    "/api/vehicles/{vehicle_id}", 
+    response_model=VehicleResponse,
+    status_code=status.HTTP_200_OK,
+    responses={404: {"description": "Vehicle not found"}}
+)
+async def partial_update_vehicle(
+    vehicle_id: int, 
+    updated_fields: dict, 
+    db: Session = Depends(get_db)
+):
+    """
+    Update an existing vehicle by ID
+    """
+    # Fetch the existing vehicle
+    vehicle = db.query(Vehicle).filter(Vehicle.id == vehicle_id).first()
+    if vehicle is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Vehicle with ID {vehicle_id} not found"
+        )
+
+    # Prevent updating the 'id' field
+    if "id" in updated_fields:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Updating the 'id' field is not allowed"
+        )
+
+    # Validation logic
+    valid_states = ["new", "used"]  # Example enum values for 'state'
+    valid_availability = ["available", "no available"]  # Example enum values for 'availability'
+
+    try:
+        # Apply updates from the request
+        for key, value in updated_fields.items():
+            if not hasattr(vehicle, key):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Field '{key}' is not a valid attribute of Vehicle"
+                )
+            
+            # Additional field-specific validations
+            if key == "state" and value not in valid_states:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Invalid value '{value}' for 'state'. Valid options: {valid_states}"
+                )
+            if key == "availability" and value not in valid_availability:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Invalid value '{value}' for 'availability'. Valid options: {valid_availability}"
+                )
+            
+            # Apply the update
+            setattr(vehicle, key, value)
+        
+        # Commit changes to the database
+        db.commit()
+        db.refresh(vehicle)  # Refresh to get updated values
+        return vehicle
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Failed to update vehicle: {str(e)}"
         )
 
 @app.delete(
@@ -162,7 +228,7 @@ async def delete_vehicle(vehicle_id: int, db: Session = Depends(get_db)):
 )
 async def chat_endpoint(chat_input: ChatInput):
     """
-    Get response from chatbot
+    Interact with AI chabot
     """
     try:
         response = get_chatbot_response(chat_input.message)

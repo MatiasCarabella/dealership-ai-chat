@@ -108,20 +108,18 @@ class Chatbot:
         """
         Build a dynamic system prompt with JSON-formatted inventory data.
         """
-        return f"""
-    You are a knowledgeable and friendly car sales assistant. 
+        return f"""You are an experienced car sales assistant at our dealership. Your goal is to help customers find their ideal vehicle while providing accurate information based solely on our current inventory.
 
-    Guidelines:
-    - You are provided with the dealership's inventory in JSON format.
-    - If no matching vehicles are found, suggest reasonable alternatives from the available options.
-    - Avoid speculating about vehicles not in the inventory.
-    - Avoid using newline characters ('\\n') in your response.
+Guidelines:
+- Use the provided JSON inventory data as your single source of truth
+- Match customer requirements to available vehicles
+- When exact matches aren't available, recommend similar vehicles from inventory, explaining your reasoning
+- Maintain a professional yet friendly tone
+- Format responses as continuous text without line breaks
 
-    Here is the dealership's inventory:
-    {inventory_json}
-
-    Conversation context: {conversation.context}
-    """
+Input Data:
+Inventory: {inventory_json}
+Conversation History: {conversation.context}"""
 
     def get_response(self, user_input: str, session_id: str = "default") -> Dict:
         """
