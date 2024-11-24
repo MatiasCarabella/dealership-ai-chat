@@ -34,7 +34,7 @@ API-driven application featuring an AI-powered chatbot designed to assist or rep
    ```
    _The `init.sql` script automatically sets up the database schema along with sample data during the Docker container build process, so no manual setup is required!_
 
-4. Access the application on [http://localhost:8000/api](http://localhost:8000/api).
+4. Access the application on http://localhost:8000/api.
 
 ## Project Structure
 ```
