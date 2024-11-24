@@ -228,7 +228,7 @@ async def delete_vehicle(vehicle_id: int, db: Session = Depends(get_db)):
 )
 async def chat_endpoint(chat_input: ChatInput):
     """
-    Interact with AI chabot
+    Interact with the AI-powered chatbot
     """
     try:
         response = get_chatbot_response(chat_input.message)
