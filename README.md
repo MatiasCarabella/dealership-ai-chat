@@ -8,7 +8,7 @@ API-driven application featuring an AI-powered chatbot designed to assist or rep
 - **Real-Time Inventory Integration**: Fetches vehicle details directly from the database.
 - **Dockerized Deployment**: Easy-to-deploy solution requiring minimal setup.
 
-## Getting Started
+## Setup Instructions
 
 ### Prerequisites
 - [Docker](https://docs.docker.com/get-started/get-docker/) and [Docker Compose](https://docs.docker.com/compose/)
