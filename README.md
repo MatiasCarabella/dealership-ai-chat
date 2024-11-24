@@ -1,4 +1,4 @@
-# Dealership AI
+<h1 align="center">Dealership AI ֎</h1>
 
 API-driven application featuring an AI-powered chatbot designed to assist or replace sales representatives at car dealerships. It uses AI to provide customers with detailed information about available vehicles, answer their queries, and offer tailored suggestions based on the dealership's inventory.
 
@@ -59,8 +59,6 @@ dealership-ai-chat/
 ## Usage
 ### API Endpoints
 
-[Documentation (Postman)](https://documenter.getpostman.com/view/10146128/2sAYBUDCCW)
-
 Endpoint | Method | Description
 --- | --- | ---
 `/api` | **GET** | 	Welcome message
@@ -69,7 +67,9 @@ Endpoint | Method | Description
 `/api/vehicles` | **POST** | 	Create a vehicle
 `/api/vehicles/{id}` | **PATCH** | 	Update a vehicle by ID
 `/api/vehicles/{id}` | **DELETE** | 	Delete a vehicle by ID
-`/api/chat` | **GET** | 	Interact with the AI-powered chatbot
+`/api/chat` | **POST** | 	Interact with the AI-powered chatbot
+
+[Documentation (Postman)](https://documenter.getpostman.com/view/10146128/2sAYBUDCCW)
 
 ### Example Chat Interaction
 Send a **POST** request to `/api/chat` with the following payload:
