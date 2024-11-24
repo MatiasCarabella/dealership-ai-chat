@@ -99,14 +99,12 @@ Response:
 }
 ```
 
+## License
+
+This project is licensed under the [MIT License](https://github.com/MatiasCarabella/dealership-ai-chat/blob/main/LICENSE).
 
 ## Acknowledgements
 
 - [**FastAPI**](https://fastapi.tiangolo.com/) ⚡ for the backend framework.
 - [**Docker**](https://www.docker.com/) 🐳 for containerized deployment.
 - [**Groq**](https://groq.com/) 🧠 for the AI services.
-
-
-## License
-
-This project is licensed under the [MIT License](https://github.com/MatiasCarabella/dealership-ai-chat/blob/main/LICENSE).
