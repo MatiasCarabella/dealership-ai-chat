@@ -15,7 +15,6 @@ API-driven application featuring an AI-powered chatbot designed to assist or rep
 - API key for [**Groq**](https://console.groq.com/docs/overview) (AI provider)
 
 ### Installation
-
 1. Clone the repository:
    ```bash
    git clone https://github.com/yourusername/dealership-ai-chat.git
