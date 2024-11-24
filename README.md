@@ -100,7 +100,7 @@ Response:
 
 ## License
 
-This project is licensed under the [MIT License](https://github.com/MatiasCarabella/dealership-ai-chat/blob/main/LICENSE).
+This project is licensed under the [MIT License](LICENSE).
 
 ## Acknowledgements
 
