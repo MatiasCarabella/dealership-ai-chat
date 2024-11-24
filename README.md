@@ -59,14 +59,15 @@ dealership-ai-chat/
 ## Usage
 ### API Endpoints
 
-[Documentation (Postman)](https://documenter.getpostman.com/view/10146128/2sAYBUDCCW#b3822fed-90b9-45a4-b16d-ddb57b6a1ba8)
+[Documentation (Postman)](https://documenter.getpostman.com/view/10146128/2sAYBUDCCW)
 
 Endpoint | Method | Description
 --- | --- | ---
 `/api` | **GET** | 	Welcome message
 `/api/vehicles` | **GET** | 	Get all vehicles
 `/api/vehicles/{id}` | **GET** | 	Get a vehicle by ID
-`/api/vehicles` | **POST** | 	Add a new vehicle to inventory
+`/api/vehicles` | **POST** | 	Create a vehicle
+`/api/vehicles/{id}` | **PATCH** | 	Update a vehicle by ID
 `/api/vehicles/{id}` | **DELETE** | 	Delete a vehicle by ID
 `/api/chat` | **GET** | 	Interact with the AI-powered chatbot
 
@@ -84,6 +85,20 @@ Response:
     "response": "Yes, we do have Toyotas in our current inventory. We have a new 2021 Toyota Corolla available at a price of $20,000.0. Would you like more information on this vehicle or would you like to explore other options as well?"
 }
 ```
+Follow-up Request:
+```json
+{
+    "message": "Yes please! Tell me about the Corolla"
+}
+```
+Response:
+```json
+{
+    "status": "success",
+    "response": "The 2021 Toyota Corolla is a new vehicle in our inventory, and it's priced at $20,000. This compact sedan is known for its reliability, fuel efficiency, and comfortable ride. It comes with a variety of standard features, including a 7-inch touchscreen infotainment system, Android Auto and Apple CarPlay compatibility, and automatic climate control. The Corolla also offers a hybrid version if you're interested in increased fuel efficiency. Overall, the Toyota Corolla is a great option for those looking for a dependable and well-equipped sedan. Let me know if you'd like to schedule a test drive or if you have any questions about financing options."
+}
+```
+
 
 ## Acknowledgements
 
