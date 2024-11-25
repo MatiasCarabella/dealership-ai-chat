@@ -16,23 +16,24 @@ API-driven application featuring an AI-powered chatbot designed to assist or rep
 
 ### Installation
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/dealership-ai-chat.git
-   cd dealership-ai-chat
+```bash
+git clone https://github.com/yourusername/dealership-ai-chat.git
+cd dealership-ai-chat
+```
 
 2. Set up the environment variables:
-   ```bash
-   cp .env.example .env
-   ```
-   Edit the `.env` file file to set your [Groq API key](https://console.groq.com/docs/overview):
-   ```
-   GROQ_API_KEY=YOUR_API_KEY_HERE
-   ```
+```bash
+cp .env.example .env
+```
+Edit the `.env` file file to set your [Groq API key](https://console.groq.com/docs/overview):
+```
+GROQ_API_KEY=YOUR_API_KEY_HERE
+```
 3. Build and start the application using Docker Compose:
-   ```bash
-   docker-compose up --build 
-   ```
-   _The `init.sql` script automatically sets up the database schema along with sample data during the Docker container build process, so no manual setup is required!_
+```bash
+docker-compose up --build 
+```
+_The `init.sql` script automatically sets up the database schema along with sample data during the Docker container build process, so no manual setup is required!_
 
 4. Access the application on http://localhost:8000/api.
 
