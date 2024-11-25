@@ -69,7 +69,7 @@ Endpoint | Method | Description
 `/api/vehicles/{id}` | **DELETE** | 	Delete a vehicle by ID
 `/api/chat` | **POST** | 	Interact with the AI-powered chatbot
 
-[Documentation (Postman)](https://documenter.getpostman.com/view/10146128/2sAYBUDCCW)
+[API Documentation (Postman)](https://documenter.getpostman.com/view/10146128/2sAYBUDCCW)
 
 ### Example Chat Interaction
 Send a **POST** request to `/api/chat` with the following payload:
