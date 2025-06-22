@@ -6,9 +6,9 @@
   </ul>
 </div>
 <div align="center">
-   <a href="https://www.python.org/" target="_blank"><img src="https://img.shields.io/badge/Python-3.13-blue?logo=python&logoColor=fff" alt="Python" /></a>
+   <a href="https://www.python.org/" target="_blank"><img src="https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=fff" alt="Python" /></a>
     <a href="https://fastapi.tiangolo.com/" target="_blank"><img src="https://img.shields.io/badge/FastAPI-009485.svg?logo=fastapi&logoColor=white" alt="FastAPI" /></a>
-   <a href="https://www.postgresql.org/" target="_blank"><img src="https://img.shields.io/badge/Postgres-17-blue?logo=postgresql&logoColor=white" alt="Postgres" /></a>
+   <a href="https://www.postgresql.org/" target="_blank"><img src="https://img.shields.io/badge/Postgres-17-316192?logo=postgresql&logoColor=white" alt="Postgres" /></a>
    <a href="https://www.docker.com/" target="_blank"><img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=fff" alt="Docker" /></a>
 </div>
 <h1></h1>
@@ -25,7 +25,7 @@ API-driven application featuring an AI-powered chatbot designed to assist or rep
 
 ### Prerequisites
 - [Docker](https://docs.docker.com/get-started/get-docker/) and [Docker Compose](https://docs.docker.com/compose/)
-- API key for [**Groq**](https://console.groq.com/docs/overview) (AI provider)
+- API key for [**Groq**](https://console.groq.com/docs/overview) (AI models provider)
 
 ### Installation
 1. Clone the repository:
