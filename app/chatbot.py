@@ -44,7 +44,7 @@ class Chatbot:
         logger.info("Initializing chatbot...")
         self.client = self._initialize_groq_client()
         self.conversations: Dict[str, Conversation] = {}
-        self.model = "mixtral-8x7b-32768"
+        self.model = "llama-3.1-8b-instant"  # AI model, can be changed if needed
         
     @staticmethod
     def _get_api_key() -> str:

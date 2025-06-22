@@ -1,5 +1,5 @@
 # Use the official Python image
-FROM python:3.10-slim
+FROM python:3.13-slim
 
 # Install system dependencies and clean up to reduce image size
 RUN apt-get update && apt-get install -y curl iputils-ping apt-utils && apt-get clean

@@ -1,4 +1,17 @@
-<h1 align="center">Dealership AI ֎</h1>
+<div id="user-content-toc">
+  <ul align="center" style="list-style: none;">
+    <summary>
+      <h1 align="center"> Dealership AI ֎</h1>
+    </summary>
+  </ul>
+</div>
+<div align="center">
+   <a href="https://www.python.org/" target="_blank"><img src="https://img.shields.io/badge/Python-3.13-blue?logo=python&logoColor=fff" alt="Python" /></a>
+    <a href="https://fastapi.tiangolo.com/" target="_blank"><img src="https://img.shields.io/badge/FastAPI-009485.svg?logo=fastapi&logoColor=white" alt="FastAPI" /></a>
+   <a href="https://www.postgresql.org/" target="_blank"><img src="https://img.shields.io/badge/Postgres-17-blue?logo=postgresql&logoColor=white" alt="Postgres" /></a>
+   <a href="https://www.docker.com/" target="_blank"><img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=fff" alt="Docker" /></a>
+</div>
+<h1></h1>
 
 API-driven application featuring an AI-powered chatbot designed to assist or replace sales representatives at car dealerships. It uses AI to provide customers with detailed information about available vehicles, answer their queries, and offer tailored suggestions based on the dealership's inventory.
 
